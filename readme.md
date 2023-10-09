@@ -12,11 +12,7 @@ To set up the Docker environment, you will need to have Docker Desktop installed
 
 The build command will build the Docker images for all of the services defined in the Docker Compose file. The up command will start all of the services and expose them on the appropriate ports.
 
-Once the services are running, you can access the dashboard at [http://localhost:8501].
-
-Usage:
-
-Navigate to [http://localhost:8501] in your web browser.
+Once the services are running, you can access the dashboard at [http://localhost:8501](http://localhost:8501).
 
 Troubleshooting:
 
