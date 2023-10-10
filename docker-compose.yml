@@ -16,17 +16,20 @@ services:
       - "5432:5432"
 
   # Python shell with requirements.txt
-  notebook:
-    build: 
-      dockerfile: ./notebook/Dockerfile
-    volumes:
-      - ./notbook:/app
-    environment:
-    - NAME=Flask-App
-    - PYTHONPATH=/app
-    working_dir: /app
-    networks:
-      - my_network
+  jupyter:
+      build:
+          context: .
+          dockerfile: notebook/Dockerfile
+      ports:
+          - 8888:8888
+      volumes:
+          - ./notebook:/notebook
+          - ./data:/data
+      environment:
+          - JUPYTER_ENABLE_LAB=yes
+          - NB_USER=infomdss
+          - CHOWN_HOME=yes
+      working_dir: /notebook
 
   # Streamlit service
   streamlit:
