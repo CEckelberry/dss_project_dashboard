@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import psycopg2
 from psycopg2 import sql
+import time
+
+time.sleep(150.0)
 
 # PostgreSQL database configuration
 db_config = {
@@ -44,6 +47,7 @@ def upload_csv_to_postgres(csv_file, table_name, conn):
 
 # Main function to upload all CSV files in the local folder
 def main():
+    conn = None  # Initialize the connection variable
     try:
         # Establish database connection
         conn = psycopg2.connect(**db_config)

@@ -27,5 +27,15 @@ services:
     ports:
       - "8501:8501"
 
+  # Uploader service
+  uploader:
+    build:
+      dockerfile: ./data/Dockerfile
+    command: python3 uploader.py
+    volumes:
+      - ./data:/app
+    networks:
+      - my_network
+
 networks:
   my_network:
