@@ -3,4 +3,4 @@ import pandas as pd
 import numpy as np
 
 
-st.title('Uber pickups in NYC')
+st.title("Solar Energy Production vs Greenhouse Gas Emissions in the Benelux Region")
