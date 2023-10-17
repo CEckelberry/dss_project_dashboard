@@ -4,14 +4,15 @@ import psycopg2
 from psycopg2 import sql
 import time
 
-time.sleep(150.0)
+
+time.sleep(3.0)
 
 # PostgreSQL database configuration
 db_config = {
     "dbname": "my_database",
     "user": "postgres",
     "password": "postgres",
-    "host": "localhost",
+    "host": "postgres",
     "port": "5432",
 }
 
