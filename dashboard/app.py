@@ -25,7 +25,8 @@ iea_data_benelux = sqldf(
     FROM df
     WHERE "Country" = 'Netherlands' OR "Country" = 'Belgium' OR "Country" = 'Luxembourg' 
     GROUP BY Time, Country, Product, Value, Unit
-    """)
+    """
+    )
 
 solar_filter = iea_data_benelux["Product"] == "Solar"
 iea_data_benelux = iea_data_benelux[solar_filter]
@@ -36,10 +37,47 @@ st.dataframe(iea_data_benelux)
 
 source = iea_data_benelux
 
-chart = alt.Chart(source).mark_line().encode(
+# Create a selection that chooses the nearest point & selects based on x-value
+nearest = alt.selection_point(nearest=True, on='mouseover',
+                        fields=['Value'], empty=False)
+
+line = alt.Chart(source).mark_line(interpolate='basis').encode(
     x='Time:T',
     y=alt.Y('Value:Q').title('GhW'),
     color='Country',
 )
 
-st.altair_chart(chart.interactive(), theme="streamlit", use_container_width=True)
+# Transparent selectors across the chart. This is what tells us
+# the x-value of the cursor
+selectors = alt.Chart(source).mark_point().encode(
+    x='Time:T',
+    opacity=alt.value(0),
+).add_params(
+    nearest
+)
+
+# Draw points on the line, and highlight based on selection
+points = line.mark_point().encode(
+    opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+)
+
+# Draw text labels near the points, and highlight based on selection
+text = line.mark_text(align='left', dx=5, dy=-5).encode(
+    text=alt.condition(nearest, 'Value:Q', alt.value(' '))
+)
+# Draw a rule at the location of the selection
+rules = alt.Chart(source).mark_rule(color='gray').encode(
+    x='Time:T',
+).transform_filter(
+    nearest
+)
+
+# Put the five layers into a chart and bind the data
+chart = alt.layer(
+    line, selectors, points, rules, text
+).properties(
+    width=1000, height=650
+)
+
+
+st.altair_chart(chart, theme="streamlit")
