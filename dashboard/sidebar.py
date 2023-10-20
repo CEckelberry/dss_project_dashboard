@@ -5,9 +5,8 @@ import time
 def sidebar():
 
     with st.sidebar:
-        """image = Image.open("./images/sidebar_illustration.jpg")
-        st.image(image, output_format="auto") """
-
+        image = Image.open("./images/sidebar_illustration.jpg")
+        st.image(image, output_format="auto") 
 
         # Dictionary containing country names and their corresponding percentages
         countries = {

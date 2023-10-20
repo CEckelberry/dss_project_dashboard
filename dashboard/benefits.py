@@ -2,20 +2,22 @@ import altair as alt
 import streamlit as st
 import pandas as pd
 import altair as alt
+from sidebar import sidebar
 
 def natl_benefits():
+    sidebar()
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.
-    df = conn.query(
+    national_benefitdf = conn.query(
         """
         SELECT * FROM "DSS_Datasets_GHG_Solar_Potential_National_Income_Benefit_from_A"
         """
     )
-    st.dataframe(df)
-    national_benefitdf = df[df['Percentile'] == 50] #only use one percentile, otherwise everything has two values
+    national_benefitdf['Percentile'] = pd.to_numeric(national_benefitdf['Percentile'])
+    national_benefitdf = national_benefitdf[national_benefitdf['Percentile'] == 50]
+     #only use one percentile, otherwise everything has two values
     national_benefitdf.set_index(['Country', 'Model', 'Scenario'], inplace=True)
-    st.dataframe(national_benefitdf)
     # Filter columns that are valid years (numeric)
     year_columns2 = [col for col in national_benefitdf.columns if col.isdigit()]
     national_benefitdf = national_benefitdf[year_columns2]
@@ -32,10 +34,11 @@ def natl_benefits():
     # Convert the 'Year' column to integers and group them in steps of 10
     stackednational_benefit['Year'] = stackednational_benefit['Year'].astype(int)
     stackednational_benefit['YearGroup'] = (stackednational_benefit['Year'] // 10) * 10
+    # Define selections
+    interval = alt.selection_interval(encodings=['x'], name='interval_intervalselection_0')
+    color_selection = alt.selection_multi(encodings=['color'], name='legend_pointselection_0')
 
-    
-
-    """     # Define the Altair chart
+    # Define the Altair chart
     chart = alt.Chart(stackednational_benefit).mark_bar(
         filled=True,
         cursor='pointer'
@@ -49,9 +52,9 @@ def natl_benefits():
                     title='Scenario'
                     ),
         opacity=alt.condition(
-            alt.not_(alt.selection_interval(encodings=['x'])),
-            alt.value(0.3),
-            alt.value(1)
+            interval & color_selection,
+            alt.value(1),
+            alt.value(0.3)
         ),
         tooltip=[
             alt.Tooltip('Country:O', title='Country'),
@@ -59,14 +62,13 @@ def natl_benefits():
             alt.Tooltip('Scenario:N')
         ]
     ).add_selection(
-        alt.selection_interval(encodings=['x'], name='interval_intervalselection_0') &
-        alt.selection_multi(encodings=['color'], name='legend_pointselection_0')
+        interval, color_selection
     ).properties(
-        width='container',
-        height='container'
+        height=750
     )
-    """
+
+    
     # Display the chart using streamlit
-    #st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
 
 natl_benefits()

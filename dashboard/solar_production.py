@@ -39,6 +39,8 @@ def solar_production():
         x=alt.X('DateTime:T', title='Month'),
         y=alt.Y('Value:Q', title='GwH Per Month Benelux'),
         color=alt.Color(scale=alt.Scale(scheme='category20'), title='Month')
+    ).properties(
+        height=550
     )
 
     # Display the chart using streamlit

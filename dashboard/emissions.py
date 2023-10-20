@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from sidebar import sidebar
 
 def ghg_emissions():
+    sidebar()
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.
@@ -49,7 +51,9 @@ def ghg_emissions():
         x=alt.X('Year:N'),
         y=alt.Y('Total Emissions:Q', title='Emissions in Millions of Tons'),
         tooltip=['Year:N', 'Total Emissions:Q']
-    ) 
+    ).properties(
+        height=550
+    )
 
     # Display the chart using streamlit
     st.altair_chart(chart, use_container_width=True)
