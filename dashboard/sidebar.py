@@ -5,12 +5,21 @@ import time
 def sidebar():
 
     with st.sidebar:
-        image = Image.open("./images/sidebar_illustration.jpg")
-        st.image(image, output_format="auto")
-        with st.echo():
-            st.write("This code will be printed to the sidebar.")
+        """image = Image.open("./images/sidebar_illustration.jpg")
+        st.image(image, output_format="auto") """
 
-        with st.spinner("Loading..."):
-            time.sleep(5)
-        st.success("Done!")
+
+        # Dictionary containing country names and their corresponding percentages
+        countries = {
+            "Netherlands": 85,
+            "Belgium": 62,
+            "Luxembourg": 47
+        }
+
+        # Display progress bars for each country
+        st.title("Country Progress Towards Paris Agreement Greenhouse Gas Reductions")
+
+        for country, percentage in countries.items():
+            st.write(f"{country}:")
+            st.progress(percentage / 100.0)
 

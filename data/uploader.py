@@ -16,6 +16,14 @@ db_config = {
     "port": "5432",
 }
 
+# Function to drop table if it exists
+def drop_table(table_name, conn):
+    with conn.cursor() as cursor:
+        drop_table_query = sql.SQL("DROP TABLE IF EXISTS {}").format(
+            sql.Identifier(table_name)
+        )
+        cursor.execute(drop_table_query)
+        conn.commit()
 
 # Function to upload CSV files to PostgreSQL
 def upload_csv_to_postgres(csv_file, table_name, conn):
@@ -56,10 +64,11 @@ def main():
         # Get list of CSV files in the current directory
         csv_files = [file for file in os.listdir() if file.endswith(".csv")]
 
-        # Upload each CSV file to PostgreSQL
+        # Drop existing tables and upload new data
         for csv_file in csv_files:
             table_name = os.path.splitext(csv_file)[0]  # Use CSV filename as table name
-            upload_csv_to_postgres(csv_file, table_name, conn)
+            drop_table(table_name, conn)  # Drop table if it exists
+            upload_csv_to_postgres(csv_file, table_name, conn)  # Upload new data
             print(f"Uploaded data from {csv_file} to table {table_name}.")
 
     except Exception as e:

@@ -19,7 +19,6 @@ services:
   streamlit:
     build:
       dockerfile: ./dashboard/Dockerfile
-    command: streamlit run app.py
     volumes:
       - ./dashboard:/dashboard
     networks:
