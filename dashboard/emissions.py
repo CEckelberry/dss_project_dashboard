@@ -4,7 +4,6 @@ import altair as alt
 from sidebar import sidebar
 
 def ghg_emissions():
-    sidebar()
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.
