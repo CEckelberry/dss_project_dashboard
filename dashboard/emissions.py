@@ -32,7 +32,7 @@ def ghg_emissions():
     emissions_columns_numeric = emissions_columns_cleaned.apply(pd.to_numeric, errors='coerce')
 
     # Sum the numeric values for each year column across all countries
-    total_emissions = emissions_columns_numeric.sum()
+    total_emissions = emissions_columns_numeric.sum().round(2)
 
     # Create a new DataFrame with 'Year' and 'Total Emissions' columns
     df_total_emissions = pd.DataFrame({
@@ -42,19 +42,30 @@ def ghg_emissions():
 
     # Resetting the index to make Year a column
     df_total_emissions.reset_index(drop=True, inplace=True)
-
-
-    #st.dataframe(df_total_emissions)
+    df_total_emissions_cleaned = df_total_emissions.dropna(subset=['Total Emissions'])
     # Create Altair bar chart
-    chart = alt.Chart(df_total_emissions).mark_bar().encode(
-        x=alt.X('Year:N'),
+    bar_chart = alt.Chart(df_total_emissions).mark_bar(color='#EF626C').encode(
+        x=alt.X('Year:N', title='Year'),
         y=alt.Y('Total Emissions:Q', title='Emissions in Millions of Tons'),
         tooltip=['Year:N', 'Total Emissions:Q']
     ).properties(
         height=550
     )
+    df_total_emissions_cleaned = df_total_emissions.dropna(subset=['Total Emissions'])
+    # Line chart code provided by user
+    
+    line_chart = alt.Chart(df_total_emissions_cleaned).mark_line(color='#3590F3').transform_window(
+        rolling_mean='mean(Total Emissions)',
+        frame=[-9, 0]
+    ).encode(
+        x='Year:O',
+        y='rolling_mean:Q',
+        tooltip=['Year:O', 'rolling_mean:Q']
+    )
+
+    combined_chart = alt.layer(bar_chart, line_chart)
 
     # Display the chart using streamlit
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(combined_chart, use_container_width=True)
 
     

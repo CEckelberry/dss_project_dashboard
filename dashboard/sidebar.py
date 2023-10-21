@@ -16,9 +16,9 @@ def sidebar():
         }
 
         # Display progress bars for each country
-        st.title("Country Progress Towards Paris Agreement Greenhouse Gas Reductions")
+        st.title("Progress To Paris Agreement Greenhouse Gas Reductions")
 
         for country, percentage in countries.items():
-            st.write(f"{country}:")
+            st.write(f"{country}: {percentage}%")
             st.progress(percentage / 100.0)
 

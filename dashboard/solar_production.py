@@ -32,10 +32,10 @@ def solar_production():
     """
     )
 
-    monthly_sum = iea_data_benelux_solar_filter.groupby(['DateTime'])['Value'].sum().reset_index()
+    monthly_sum = iea_data_benelux_solar_filter.groupby(['DateTime'])['Value'].sum().round(2).reset_index()
 
     # Altair Chart
-    chart = alt.Chart(monthly_sum).mark_bar().encode(
+    chart = alt.Chart(monthly_sum).mark_bar(color="#3590F3").encode(
         x=alt.X('DateTime:T', title='Month'),
         y=alt.Y('Value:Q', title='GwH Per Month Benelux'),
         color=alt.Color(scale=alt.Scale(scheme='category20'), title='Month')

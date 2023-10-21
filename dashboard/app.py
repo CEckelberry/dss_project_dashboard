@@ -13,8 +13,10 @@ sidebar()
 show_pages(
     [
         Page("app.py", "Solar Production vs GhG Emissions", ":city_sunrise:"),
-        Page("page2.py", "Forest and Land", ":deciduous_tree:"),
-        Page("benefits.py", "National Benefits Energy Transition", ":classical_building:"),
+        Page("solar_panels.py", "Number of Solar Panels Needed", ":slot_machine:"),
+        Page("energy_production.py", "Energy Production Sources", ":factory:"),
+        Page("predictions.py", "Solar Production Predictions", ":chart_with_upwards_trend:"),
+        Page("emissions_sources.py", "GhG Emissions Sources", ":biohazard_sign:"),
     ]
 )
 
