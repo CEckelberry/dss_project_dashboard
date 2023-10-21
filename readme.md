@@ -22,3 +22,13 @@ Make sure that Docker Desktop is installed and running.
 Make sure that you have cloned this repository to your local machine.
 Make sure that you have run the docker compose build and docker compose up commands.
 If you are still having trouble, please open an issue in this repository.
+
+Color Palette:
+
+    {
+    #17BEBB
+    #3590F3
+    #EF626C
+    #DFC2F2
+    #D8D8F6
+    }
