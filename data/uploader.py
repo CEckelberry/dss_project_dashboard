@@ -5,7 +5,7 @@ from psycopg2 import sql
 import time
 
 
-time.sleep(3.0)
+time.sleep(6.0)
 
 # PostgreSQL database configuration
 db_config = {
