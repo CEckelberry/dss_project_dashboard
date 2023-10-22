@@ -54,11 +54,12 @@ def emissions_sources():
 
     filtered_data = top_10_industries[top_10_industries["Year"] == str(option)]
 
+    colors = ["#17BEBB","#3590F3","#EF626C","#DFC2F2","#D8D8F6", "#c1d7c6", "#a3bcf9", "#7796cb", "#576490", "#f6e8ea"]
     # Create Altair chart
     base = alt.Chart(filtered_data).encode(
         alt.Theta("Emissions:Q").stack(True),
         alt.Radius("Emissions:Q").scale(type="sqrt", zero=True, rangeMin=20),
-        color="Industry:N"
+        color=alt.Color("Industry:N", scale=alt.Scale(range=colors))
     ).properties(
         height=580
     )

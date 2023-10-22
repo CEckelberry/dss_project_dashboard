@@ -6,5 +6,15 @@ def solar_panels():
     add_page_title("Number of Solar Panels Needed", layout="wide")
     sidebar()
 
+    # Initialize connection.
+    conn = st.experimental_connection("postgresql", type="sql")
+    # Perform query.
+    df = conn.query(
+        """
+        SELECT * FROM "DSS_Datasets_GHG_energy_production_benelux"
+        """
+    )
+
+    st.dataframe(df)
 
 solar_panels()
