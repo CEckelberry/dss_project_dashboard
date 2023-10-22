@@ -8,8 +8,11 @@ from st_pages import Page, show_pages, add_page_title
 
 add_page_title("Emissions Sources", layout="wide")
 
+sidebar()
+
 def emissions_sources():
-    sidebar()
+    
+    st.header("Top 10 Greenhouse Gas Emissions Industries per Year in the Benelux")
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.

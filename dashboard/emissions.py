@@ -3,6 +3,7 @@ import pandas as pd
 import altair as alt
 from sidebar import sidebar
 
+@st.cache_data
 def ghg_emissions():
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
