@@ -16,7 +16,7 @@ show_pages(
         Page("energy_production.py", "Energy Production", ":factory:"),
         Page("predictions.py", "Solar Production Predictions", ":chart_with_upwards_trend:"),
         Page("emissions_sources.py", "Compare Yearly Emissions Sources", ":biohazard_sign:"),
-        Page("solar_panels.py", "How many solar panels are needed?", ":slot_machine:"),
+        Page("solar_panels.py", "The number of solar panels needed for the substitution of fossil fuels", ":slot_machine:"),
     ]
 )
 

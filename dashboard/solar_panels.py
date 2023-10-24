@@ -4,7 +4,7 @@ import altair as alt
 from st_pages import Page, show_pages, add_page_title
 from sidebar import sidebar 
 
-add_page_title("This is how many solar panels are needed to fully replace fossil fuels", layout="wide")
+add_page_title("The number of solar panels needed for the substitution of fossil fuels", layout="wide")
 
 def solar_panels():
     sidebar()
