@@ -4,26 +4,10 @@ import altair as alt
 from st_pages import Page, show_pages, add_page_title
 from sidebar import sidebar 
 
-add_page_title("This is how many solar panels are needed to fully replace fossil fuels", layout="wide")
+add_page_title("The number of solar panels needed for the substitution of fossil fuels", layout="wide")
 
 def solar_panels():
     sidebar()
-
-    st.markdown(
-        """
-        <div style='text-align: justify;'>
-
-        <p style='font-size: 18px;'>An estimation of the number of solar panels needed to fully replace fossil fuels is presented below.</p>
-
-        <p style='font-size: 18px;'>One significant aspect that directly influences solar panel performance is its wattage, and it will affect how many panels are needed. The higher the wattage, the more power a panel can generate.</p>
-
-        <p style='font-size: 18px;'>Most residential solar panels have ratings of 250 to 400 watts. The most efficient solar panels on the market are 370- to 445-watt models. The higher the wattage rating, the higher the output. In turn, the fewer panels you might be needed.</p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.
@@ -50,22 +34,41 @@ def solar_panels():
 
     # Convert total electricity production to watt-hours
     total_fossil_fuels_watts = total_fossil_fuels * gwh_to_wh
-    total_solar_energy_watts = total_solar_energy * gwh_to_wh
 
     # Calculate the number of solar panels needed, assuming that one solar panel produces 400 watt energy
     number_of_solar_panels = int(total_fossil_fuels_watts / 400)
+    
+    col1, col2 = st.columns([1, 1])
 
-    # Slider for selecting the wattage
-    selected_wattage = st.slider('Please select the wattage (between 250 and 500)', 250, 500, 400)
+    with col1:
+        st.markdown(f"<p style='text-align:center;'>Please select wattage (between 250 and 500)</p>",
+            unsafe_allow_html=True
+        )
 
-    # Calculate the number of solar panels needed, based on the selected wattage
-    number_of_solar_panels = int(total_fossil_fuels_watts / selected_wattage)
+        # Slider for selecting the wattage
+        selected_wattage = st.slider('', 250, 500, 400) 
 
-    st.write(f"Based on the data and the selected wattage ({selected_wattage} watts), the number of solar panels needed to replace fossil fuels is: ", number_of_solar_panels)
+        # Calculate the number of solar panels needed, based on the selected wattage
+        number_of_solar_panels = int(total_fossil_fuels_watts / selected_wattage)
 
-    colors = ['#17BEBB', '#3590F3']
+        st.markdown(f"<p style='text-align:center;'>Based on the data and the selected wattage ({selected_wattage} watts), the number of solar panels needed to replace fossil fuels is calculated</p>",
+            unsafe_allow_html=True
+        )
 
-    st.subheader("Comparison of Electricity Production from Fossil Fuels and Solar Energy")
+        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; width: 350px; background-color:#e6f3ff;padding:5px;border-radius:10px; margin: auto;'> <p style='font-size:18px;font-weight:bold;margin-bottom:0px;'>Number of Solar Panels Needed</p> <p style='font-size:24px;font-weight:bold;margin-top:0px;'>{number_of_solar_panels}</p> </div>", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(
+            """
+            <div style='text-align: justify; background-color: #f9f9f9; padding: 20px; border-radius: 10px;'>
+                <p style='font-size: 18px;'>\U0001F4A1<span style='margin-left: 10px'>Outlined here is an estimate of the required solar panels to entirely substitute fossil fuels.</span></p>
+                <p style='font-size: 18px;'>Solar panel performance is significantly influenced by wattage, where higher wattage panels generate more power. Residential solar panels typically range from 250 to 400 watts, with the most efficient models offering 370 to 445 watts. Higher wattage translates to increased energy output, reducing the number of panels needed for the same power generation.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    st.markdown("<div style='text-align: center;margin-top: 30px;'><h3>Comparison of Electricity Production from Fossil Fuels and Solar Energy</h3></div>", unsafe_allow_html=True)
 
     data = pd.DataFrame({
         'Energy Source': ['Fossil Fuels', 'Solar Energy'],
@@ -77,10 +80,10 @@ def solar_panels():
     y=alt.Y('Energy Source', title=None),
     color=alt.Color('Energy Source', scale=alt.Scale(range=['#17BEBB', '#3590F3']))
     ).properties(
-        width=600,
-        height=400
+        width=700,
+        height=500
     )
 
-    st.write(chart)
+    st.write(chart, use_container_width=True)
 
 solar_panels()
