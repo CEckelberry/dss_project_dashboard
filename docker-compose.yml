@@ -35,6 +35,15 @@ services:
       - ./data:/app
     networks:
       - my_network
+  
+  # IEA data downloader service
+  data_downloader:
+    build:
+      dockerfile: ./downloader_iea/Dockerfile
+    volumes:
+      - ./data:/app
+    networks:
+      - my_network
 
 networks:
   my_network:
