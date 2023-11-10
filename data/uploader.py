@@ -16,6 +16,7 @@ db_config = {
     "port": "5432",
 }
 
+
 # Function to drop table if it exists
 def drop_table(table_name, conn):
     with conn.cursor() as cursor:
@@ -24,6 +25,7 @@ def drop_table(table_name, conn):
         )
         cursor.execute(drop_table_query)
         conn.commit()
+
 
 # Function to upload CSV files to PostgreSQL
 def upload_csv_to_postgres(csv_file, table_name, conn):

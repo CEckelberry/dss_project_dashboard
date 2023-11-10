@@ -32,18 +32,12 @@ services:
       dockerfile: ./data/Dockerfile
     command: python3 uploader.py
     volumes:
-      - ./data:/app
+      - csv_volume:/app/data
     networks:
       - my_network
-  
-  # IEA data downloader service
-  data_downloader:
-    build:
-      dockerfile: ./downloader_iea/Dockerfile
-    volumes:
-      - ./data:/app
-    networks:
-      - my_network
+
+volumes:
+  csv_volume: {}
 
 networks:
   my_network:

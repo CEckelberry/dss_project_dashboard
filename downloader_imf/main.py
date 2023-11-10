@@ -1,42 +1,107 @@
+import os
+from datetime import datetime
+import time
+import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.action_chains import ActionChains
 
-# Set up the Selenium webdriver (make sure you have the appropriate webdriver executable in your PATH)
-driver = webdriver.Chrome()
 
-try:
-    # Navigate to the ArcGIS website
-    driver.get(
-        "https://experience.arcgis.com/experience/86e7e1aa0e6c4b07818ba3d36ba10ebe/page/Page-1/?data_id=dataSource_3-0%3A128&views=Select-a-Country"
+def login_to_iea(username, password, driver):
+@@ -31,40 +34,61 @@ def download_latest_csv_file(url, download_path, username, password):
+    driver.get(url)
+
+    # Wait for the schedule section to load
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "schedule")))
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located(
+            (By.CLASS_NAME, "m-product-releases-schedule__items")
+        )
     )
 
-    # Wait for the search input element to be present (wait for a maximum of 20 seconds)
-    search_input = WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Search']"))
+    # Check the schedule section to see if a new CSV file is available
+    schedule_section = driver.find_element(By.ID, "schedule")
+    latest_update_date = None
+    # Get the modified timestamp of the local file, if it exists
+    local_file_path = os.path.join(download_path, "DSS_Datasets_GHG_Solar_iea_data.csv")
+    local_modified_time = (
+        os.path.getmtime(local_file_path) if os.path.exists(local_file_path) else None
     )
 
-    # Interact with the search input
-    search_input.send_keys("Netherlands, The")
-    search_input.send_keys(Keys.RETURN)
+    for schedule_item in schedule_section.find_elements(
+    for schedule_item in driver.find_elements(
+        By.CLASS_NAME, "m-product-releases-schedule-item"
+    ):
+        if "Scheduled" in schedule_item.text:
+            latest_update_date = schedule_item.find_element(
+        status = (
+            schedule_item.find_element(By.CLASS_NAME, "a-label").text.strip().lower()
+        )
+        schedule_date = schedule_item.find_element(
+            By.CLASS_NAME, "m-product-releases-schedule-item__date"
+        ).text
+        schedule_date = datetime.strptime(schedule_date, "%d/%m/%Y").timestamp()
 
-    # Wait for the download button to be clickable (wait for a maximum of 20 seconds)
-    download_button = WebDriverWait(driver, 20).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, ".widget-button-text"))
-    )
+        # Compare the schedule date with the local file's modified date
+        if status == "scheduled" and (
+            local_modified_time is None or schedule_date > local_modified_time
+        ):
+            # Scroll the download link into view
+            download_link = schedule_item.find_element(
+                By.CLASS_NAME, "m-product-releases-schedule-item__date"
+            ).text
+            break
+            )
+            actions = ActionChains(driver)
+            actions.move_to_element(download_link).perform()
 
-    # Click on the download button to download the CSV
-    download_button.click()
+    if latest_update_date is not None:
+        # Download the latest CSV file
+        download_link = driver.find_element(By.CLASS_NAME, "a-link__label")
+        download_link.click()
+            # Wait for a short moment to ensure the element is in view before clicking
+            time.sleep(1)
 
-except TimeoutException as e:
-    # Handle timeout exception
-    print(f"TimeoutException: {str(e)}")
-except Exception as e:
-    # Handle any other exceptions that might occur during the process
-    print(f"Error: {str(e)}")
-finally:
-    # Close the webdriver
+        # Wait for the file to be downloaded
+        WebDriverWait(driver, 60).until(lambda x: len(os.listdir(download_path)) > 0)
+            # Click the download link using JavaScript to bypass the intercept issue
+            driver.execute_script("arguments[0].click();", download_link)
+
+        # Get the downloaded filename
+        downloaded_files = os.listdir(download_path)
+        csv_filename = [file for file in downloaded_files if file.endswith(".csv")][0]
+            # Wait for the file to be downloaded
+            WebDriverWait(driver, 60).until(
+                lambda x: len(os.listdir(download_path)) > 0
+            )
+
+        # Rename the downloaded file to the desired filename
+        os.rename(
+            os.path.join(download_path, csv_filename),
+            os.path.join(download_path, "DSS_Datasets_GHG_Solar_iea_data.csv"),
+        )
+    else:
+        print("No new CSV file available.")
+            # Rename the downloaded file to the desired filename (overwrite if it already exists)
+            downloaded_files = os.listdir(download_path)
+            csv_filename = [file for file in downloaded_files if file.endswith(".csv")][
+                0
+            ]
+            downloaded_file_path = os.path.join(download_path, csv_filename)
+            os.replace(downloaded_file_path, local_file_path)
+            print(f"Downloaded and saved the latest CSV file for {schedule_date}.")
+
+            break  # Exit the loop after downloading the latest file
+
     driver.quit()
+
+@@ -89,7 +113,7 @@ def filter_csv_file(input_filename, output_filename):
+
+if __name__ == "__main__":
+    url = "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics"
+    download_path = "../data/"
+    download_path = os.path.join(os.getcwd(), "..", "data")
+    username = "cole.eckelberry@gmail.com"
+    password = "wzg.vkp.YWM*zkn1ugf"

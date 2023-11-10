@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.options import Options
 
 
 def login_to_iea(username, password, driver):
@@ -27,85 +28,73 @@ def login_to_iea(username, password, driver):
 
 
 def download_latest_csv_file(url, download_path, username, password):
-    driver = webdriver.Chrome()
+    # Set up Chrome options to specify the download directory
+    chrome_options = Options()
+    prefs = {"download.default_directory": download_path}
+    chrome_options.add_experimental_option("prefs", prefs)
+
+    # Initialize the Chrome WebDriver with the specified options
+    driver = webdriver.Chrome(options=chrome_options)
+
     login_to_iea(username, password, driver)
 
     # Navigate to the target URL after logging in
     driver.get(url)
 
-    # Wait for the schedule section to load
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located(
-            (By.CLASS_NAME, "m-product-releases-schedule__items")
-        )
-    )
-
-    # Get the modified timestamp of the local file, if it exists
-    local_file_path = os.path.join(download_path, "DSS_Datasets_GHG_Solar_iea_data.csv")
-    local_modified_time = (
-        os.path.getmtime(local_file_path) if os.path.exists(local_file_path) else None
-    )
-
-    for schedule_item in driver.find_elements(
-        By.CLASS_NAME, "m-product-releases-schedule-item"
-    ):
-        status = (
-            schedule_item.find_element(By.CLASS_NAME, "a-label").text.strip().lower()
-        )
-        schedule_date = schedule_item.find_element(
-            By.CLASS_NAME, "m-product-releases-schedule-item__date"
-        ).text
-        schedule_date = datetime.strptime(schedule_date, "%d/%m/%Y").timestamp()
-
-        # Compare the schedule date with the local file's modified date
-        if status == "scheduled" and (
-            local_modified_time is None or schedule_date > local_modified_time
-        ):
-            # Scroll the download link into view
-            download_link = schedule_item.find_element(
-                By.CLASS_NAME, "m-product-releases-schedule-item__date"
+    # Wait for the necessary elements to load
+    try:
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located(
+                (By.CLASS_NAME, "m-product-releases-schedule__items")
             )
-            actions = ActionChains(driver)
-            actions.move_to_element(download_link).perform()
+        )
+        time.sleep(5)  # Additional wait for the page to fully load
 
-            # Wait for a short moment to ensure the element is in view before clicking
-            time.sleep(1)
+        # Find the download link using the provided XPath
+        download_link = driver.find_element(
+            By.XPATH, "(//span[normalize-space()='CSV'])[1]"
+        )
+        download_link.click()
 
-            # Click the download link using JavaScript to bypass the intercept issue
-            driver.execute_script("arguments[0].click();", download_link)
-
-            # Wait for the file to be downloaded
-            WebDriverWait(driver, 60).until(
-                lambda x: len(os.listdir(download_path)) > 0
+        time.sleep(10)  # Wait for the download to complete
+        files = os.listdir(download_path)
+        files = [f for f in files if f.endswith(".csv")]
+        if files:
+            downloaded_file_name = max(
+                files, key=lambda x: os.path.getctime(os.path.join(download_path, x))
             )
 
-            # Rename the downloaded file to the desired filename (overwrite if it already exists)
-            downloaded_files = os.listdir(download_path)
-            csv_filename = [file for file in downloaded_files if file.endswith(".csv")][
-                0
-            ]
-            downloaded_file_path = os.path.join(download_path, csv_filename)
-            os.replace(downloaded_file_path, local_file_path)
-            print(f"Downloaded and saved the latest CSV file for {schedule_date}.")
+        print(
+            "Download started. Please check the specified download folder for the CSV file."
+        )
+    except Exception as e:
+        print(f"An error occurred while attempting to download the CSV: {e}")
+    finally:
+        driver.quit()
 
-            break  # Exit the loop after downloading the latest file
-
-    driver.quit()
+    return downloaded_file_name
 
 
 def filter_csv_file(input_filename, output_filename):
-    df = pd.read_csv(input_filename)
+    # Read the CSV data into a DataFrame
+    try:
+        df = pd.read_csv(input_filename, skiprows=8, encoding="utf-8")
+    except UnicodeDecodeError:
+        try:
+            df = pd.read_csv(input_filename, skiprows=8, encoding="iso-8859-1")
+        except UnicodeDecodeError:
+            df = pd.read_csv(input_filename, skiprows=8, encoding="cp1252")
 
     # Filter for the Netherlands, Belgium, and Luxembourg
-    countries = ["Netherlands", "Belgium", "Luxembourg"]
+    countries = [
+        "Netherlands, The",
+        "Belgium",
+        "Luxembourg",
+    ]  # Adjusted country names to match your data
     df_filtered = df[df["Country"].isin(countries)]
 
-    # Filter for the product category Solar
+    # Filter for the product category Solar (if applicable)
     df_filtered = df_filtered[df_filtered["Product"] == "Solar"]
-
-    # Filter for just the necessary columns
-    columns_to_keep = ["Country", "Time", "Balance", "Product", "Value", "Unit"]
-    df_filtered = df_filtered[columns_to_keep]
 
     # Save the filtered data to a new CSV file
     df_filtered.to_csv(output_filename, index=False)
@@ -113,13 +102,33 @@ def filter_csv_file(input_filename, output_filename):
 
 if __name__ == "__main__":
     url = "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics"
-    download_path = os.path.join(os.getcwd(), "..", "data")
+
+    # Set the download path to the current script directory
+    script_dir = os.path.dirname(__file__)
+    download_path = script_dir
+
+    # User credentials
     username = "cole.eckelberry@gmail.com"
     password = "wzg.vkp.YWM*zkn1ugf"
 
-    download_latest_csv_file(url, download_path, username, password)
+    # Download the latest CSV file and get its name
+    downloaded_csv_name = download_latest_csv_file(
+        url, download_path, username, password
+    )
 
-    # Filter the CSV file for the Netherlands, Belgium, and Luxembourg
-    input_filename = os.path.join(download_path, "DSS_Datasets_GHG_Solar_iea_data.csv")
-    output_filename = "../data/DSS_Datasets_GHG_Solar_iea_data.csv"
-    filter_csv_file(input_filename, output_filename)
+    if downloaded_csv_name:
+        # Define the input file path using the downloaded file name
+        input_filename = os.path.join(download_path, downloaded_csv_name)
+
+        # Define the output file path in the 'data' directory
+        data_dir = os.path.join(script_dir, "..", "data")
+        output_filename = os.path.join(data_dir, "DSS_Datasets_GHG_Solar_iea_data.csv")
+
+        # Check if the 'data' directory exists; create it if it doesn't
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+
+        # Filter and transform the CSV file
+        filter_csv_file(input_filename, output_filename)
+    else:
+        print("No CSV file was downloaded. Please check the download process.")
