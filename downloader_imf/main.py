@@ -1,107 +1,99 @@
-import os
-from datetime import datetime
-import time
 import pandas as pd
+import os
+import zipfile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
+import time
+import shutil
 
 
-def login_to_iea(username, password, driver):
-@@ -31,40 +34,61 @@ def download_latest_csv_file(url, download_path, username, password):
-    driver.get(url)
+def download_latest_csv_file(urls, download_path):
+    # Set up Chrome options to specify the download directory
+    chrome_options = Options()
+    prefs = {"download.default_directory": download_path}
+    chrome_options.add_experimental_option("prefs", prefs)
 
-    # Wait for the schedule section to load
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "schedule")))
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located(
-            (By.CLASS_NAME, "m-product-releases-schedule__items")
-        )
-    )
+    # Initialize the WebDriver
+    driver = webdriver.Chrome(options=chrome_options)
 
-    # Check the schedule section to see if a new CSV file is available
-    schedule_section = driver.find_element(By.ID, "schedule")
-    latest_update_date = None
-    # Get the modified timestamp of the local file, if it exists
-    local_file_path = os.path.join(download_path, "DSS_Datasets_GHG_Solar_iea_data.csv")
-    local_modified_time = (
-        os.path.getmtime(local_file_path) if os.path.exists(local_file_path) else None
-    )
+    try:
+        for url in urls:
+            # Navigate to the website
+            driver.get(url)
 
-    for schedule_item in schedule_section.find_elements(
-    for schedule_item in driver.find_elements(
-        By.CLASS_NAME, "m-product-releases-schedule-item"
-    ):
-        if "Scheduled" in schedule_item.text:
-            latest_update_date = schedule_item.find_element(
-        status = (
-            schedule_item.find_element(By.CLASS_NAME, "a-label").text.strip().lower()
-        )
-        schedule_date = schedule_item.find_element(
-            By.CLASS_NAME, "m-product-releases-schedule-item__date"
-        ).text
-        schedule_date = datetime.strptime(schedule_date, "%d/%m/%Y").timestamp()
-
-        # Compare the schedule date with the local file's modified date
-        if status == "scheduled" and (
-            local_modified_time is None or schedule_date > local_modified_time
-        ):
-            # Scroll the download link into view
-            download_link = schedule_item.find_element(
-                By.CLASS_NAME, "m-product-releases-schedule-item__date"
-            ).text
-            break
-            )
-            actions = ActionChains(driver)
-            actions.move_to_element(download_link).perform()
-
-    if latest_update_date is not None:
-        # Download the latest CSV file
-        download_link = driver.find_element(By.CLASS_NAME, "a-link__label")
-        download_link.click()
-            # Wait for a short moment to ensure the element is in view before clicking
-            time.sleep(1)
-
-        # Wait for the file to be downloaded
-        WebDriverWait(driver, 60).until(lambda x: len(os.listdir(download_path)) > 0)
-            # Click the download link using JavaScript to bypass the intercept issue
-            driver.execute_script("arguments[0].click();", download_link)
-
-        # Get the downloaded filename
-        downloaded_files = os.listdir(download_path)
-        csv_filename = [file for file in downloaded_files if file.endswith(".csv")][0]
-            # Wait for the file to be downloaded
-            WebDriverWait(driver, 60).until(
-                lambda x: len(os.listdir(download_path)) > 0
+            # Wait for the download button to be present
+            WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located(
+                    (
+                        By.XPATH,
+                        "//a[normalize-space()='Download']//div[@class='stacked-icon']//*[name()='svg']",
+                    )
+                )
             )
 
-        # Rename the downloaded file to the desired filename
-        os.rename(
-            os.path.join(download_path, csv_filename),
-            os.path.join(download_path, "DSS_Datasets_GHG_Solar_iea_data.csv"),
-        )
-    else:
-        print("No new CSV file available.")
-            # Rename the downloaded file to the desired filename (overwrite if it already exists)
-            downloaded_files = os.listdir(download_path)
-            csv_filename = [file for file in downloaded_files if file.endswith(".csv")][
-                0
-            ]
-            downloaded_file_path = os.path.join(download_path, csv_filename)
-            os.replace(downloaded_file_path, local_file_path)
-            print(f"Downloaded and saved the latest CSV file for {schedule_date}.")
+            # Find the download button and click it
+            download_button = driver.find_element(
+                By.XPATH,
+                "//a[normalize-space()='Download']//div[@class='stacked-icon']//*[name()='svg']",
+            )
+            download_button.click()
 
-            break  # Exit the loop after downloading the latest file
+            # Wait for the download to complete (adjust time as necessary)
+            time.sleep(10)
 
-    driver.quit()
+    finally:
+        # Close the browser
+        driver.quit()
 
-@@ -89,7 +113,7 @@ def filter_csv_file(input_filename, output_filename):
 
-if __name__ == "__main__":
-    url = "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics"
-    download_path = "../data/"
-    download_path = os.path.join(os.getcwd(), "..", "data")
-    username = "cole.eckelberry@gmail.com"
-    password = "wzg.vkp.YWM*zkn1ugf"
+def process_csv_files(directory, file_names):
+    for file in os.listdir(directory):
+        if file.endswith(".zip"):
+            zip_path = os.path.join(directory, file)
+            temp_dir = os.path.join(directory, "temp")
+            os.makedirs(temp_dir, exist_ok=True)
+
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                zip_ref.extractall(temp_dir)
+
+            for file_name in file_names:
+                extracted_file_path = os.path.join(temp_dir, file_name + ".csv")
+                if os.path.exists(extracted_file_path):
+                    final_file_path = os.path.join(directory, file_name + ".csv")
+                    if os.path.exists(final_file_path):
+                        existing_df = pd.read_csv(final_file_path)
+                        new_df = pd.read_csv(extracted_file_path)
+                        combined_df = pd.concat([existing_df, new_df])
+                        combined_df.to_csv(final_file_path, index=False)
+                    else:
+                        shutil.move(extracted_file_path, final_file_path)
+
+            # Clean up: remove the temporary directory and the zip file
+            shutil.rmtree(temp_dir)
+            os.remove(zip_path)
+
+
+# Set the download path to the current script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# URLs of the websites
+urls = [
+    "https://climatedata.imf.org/datasets/4336ea7f6ea443bb80f83f2cd53f2672/about",
+    "https://climatedata.imf.org/datasets/a984f9c8f4e54094b80ac7e203986fc9/about",
+    "https://climatedata.imf.org/datasets/74c27e7285fd4bd18927e459221e63a2/about",
+]
+
+# Specific CSV files to keep
+csv_files_to_keep = [
+    "National_Greenhouse_Gas_Emissions_Inventories_and_Implied_National_Mitigation_Nationally_Determined_Contributions_Targets",
+    "CO2_Emissions_Emissions_Intensities_and_Emissions_Multipliers",
+]
+
+# Call the function to download the CSV files
+download_latest_csv_file(urls, script_dir)
+
+# Process the CSV files
+process_csv_files(script_dir, csv_files_to_keep)

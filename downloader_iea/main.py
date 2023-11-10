@@ -100,6 +100,24 @@ def filter_csv_file(input_filename, output_filename):
     df_filtered.to_csv(output_filename, index=False)
 
 
+def create_benelux_energy_csv(input_filename, output_filename):
+    # Read the CSV data into a DataFrame
+    try:
+        df = pd.read_csv(input_filename, skiprows=8, encoding="utf-8")
+    except UnicodeDecodeError:
+        try:
+            df = pd.read_csv(input_filename, skiprows=8, encoding="iso-8859-1")
+        except UnicodeDecodeError:
+            df = pd.read_csv(input_filename, skiprows=8, encoding="cp1252")
+
+    # Filter for the Netherlands, Belgium, and Luxembourg
+    countries = ["Netherlands, The", "Belgium", "Luxembourg"]
+    df_filtered = df[df["Country"].isin(countries)]
+
+    # Save the filtered data to a new CSV file
+    df_filtered.to_csv(output_filename, index=False)
+
+
 if __name__ == "__main__":
     url = "https://www.iea.org/data-and-statistics/data-product/monthly-electricity-statistics"
 
@@ -123,6 +141,14 @@ if __name__ == "__main__":
         # Define the output file path in the 'data' directory
         data_dir = os.path.join(script_dir, "..", "data")
         output_filename = os.path.join(data_dir, "DSS_Datasets_GHG_Solar_iea_data.csv")
+
+        # Define the output file path for the Benelux energy production CSV
+        output_benelux_filename = os.path.join(
+            data_dir, "DSS_Datasets_GHG_energy_production_benelux.csv"
+        )
+
+        # Create the Benelux energy production CSV file
+        create_benelux_energy_csv(input_filename, output_benelux_filename)
 
         # Check if the 'data' directory exists; create it if it doesn't
         if not os.path.exists(data_dir):
