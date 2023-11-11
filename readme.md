@@ -1,34 +1,40 @@
 # Data Science and Society Dashboard: Greenhouse Gas Emissions for the Benelux Region and Solar as our Savior
 
-This repository contains a Docker Compose file for running a Data Science and Society Dashboard that displays greenhouse gas emissions for the Benelux region and the potential of solar energy to reduce those emissions.
+## Overview
 
-To set up the Docker environment, you will need to have Docker Desktop installed and running. Once you have Docker Desktop running, you can clone this repository and run the following two commands (while being in the director you just cloned down as shown in the screenshot below):
+This repository hosts the Data Science and Society Dashboard, focusing on greenhouse gas emissions in the Benelux region and exploring the role of solar energy in reducing these emissions.
 
-`docker compose build`
+## Setup
 
-`docker compose up`
+The dashboard is containerized using Docker. Follow these steps to set it up:
 
-![screencap install](install_screencap.png "Install Screencap")
+### Prerequisites
 
-The build command will build the Docker images for all of the services defined in the Docker Compose file. The up command will start all of the services and expose them on the appropriate ports.
+- Docker installed and running on your machine.
 
-Once the services are running, you can access the dashboard at [http://localhost:8501](http://localhost:8501).
+### Installation
 
-Troubleshooting:
+1. Clone this repository.
+2. Follow the platform-specific instructions below.
 
-If you are having trouble running the dashboard, please check the following:
+### For Windows Users
 
-Make sure that Docker Desktop is installed and running.
-Make sure that you have cloned this repository to your local machine.
-Make sure that you have run the docker compose build and docker compose up commands.
-If you are still having trouble, please open an issue in this repository.
+- Run the `startup.ps1` PowerShell script.
+- This script performs several tasks:
+  - Executes Python/Selenium scripts to download current CSV data from IEA/IMF via Chrome.
+  - Takes about 4 minutes to complete.
+  - Once done, it runs the `docker-compose` command to set up the environment.
+- Wait for the PostgreSQL database to initialize, and the uploader script to insert data. Look for specific confirmation lines in the terminal (shown below).
+- ![uploader has finished](image.png)
 
-Color Palette:
+### For Linux Users
 
-    {
-    #17BEBB
-    #3590F3
-    #EF626C
-    #DFC2F2
-    #D8D8F6
-    }
+- Execute the `startup.sh` Shell script.
+- Similar to Windows, this script downloads CSV data and sets up the Docker environment.
+- Wait for the database and data uploader to complete their tasks.
+- ![uploader has finished](image.png)
+
+## Using the Dashboard
+
+- Access the Dashboard at: http://localhost:8501/
+- The Dashboard caches queries for improved performance. Switching between panels should not always trigger a re-run of queries.
