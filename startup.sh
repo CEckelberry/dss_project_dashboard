@@ -25,6 +25,10 @@ if ! command_exists pip3.10; then
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     python3.10 get-pip.py
     rm get-pip.py
+
+    # Add the directory where pip is installed to PATH
+    PIP_PATH="$(python3.10 -m site --user-base)/bin"
+    export PATH="$PIP_PATH:$PATH"
 fi
 
 # List of required Python packages
