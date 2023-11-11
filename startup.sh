@@ -20,6 +20,12 @@ install_google_chrome() {
 # Install a specific version of ChromeDriver
 install_chromedriver() {
     echo "Installing ChromeDriver version 119.0.6045.105..."
+
+    # Remove any existing ChromeDriver binaries in the system to avoid version conflicts
+    sudo rm -f /usr/local/bin/chromedriver
+    sudo rm -f /usr/bin/chromedriver
+
+    # Download ChromeDriver
     curl -L "https://chromedriver.storage.googleapis.com/119.0.6045.105/chromedriver_linux64.zip" -o chromedriver_linux64.zip
     
     # Extract ChromeDriver and move it to a known directory
