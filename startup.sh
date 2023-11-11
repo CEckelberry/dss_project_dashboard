@@ -89,4 +89,4 @@ for path in "${script_paths[@]}"; do
 done
 
 # Start Docker Compose services
-docker-compose up --build
+sudo docker-compose up --build
