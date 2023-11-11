@@ -1,5 +1,4 @@
 version: "3.9"
-
 services:
   # Postgres database
   postgres:
@@ -14,30 +13,25 @@ services:
       - my_network
     ports:
       - "5432:5432"
-
-  # Uploader service
-  uploader:
-    build:
-      dockerfile: ./data/Dockerfile
-    command: python3 uploader.py
-    volumes:
-      - csv_volume:/app/data
-    networks:
-      - my_network
-
   # Streamlit service
   streamlit:
     build:
       dockerfile: ./dashboard/Dockerfile
+    command: streamlit run app.py
     volumes:
       - ./dashboard:/dashboard
     networks:
       - my_network
     ports:
       - "8501:8501"
-
-volumes:
-  csv_volume: {}
-
+  # Uploader service
+  uploader:
+    build:
+      dockerfile: ./data/Dockerfile
+    command: python3 uploader.py
+    volumes:
+      - ./data:/app
+    networks:
+      - my_network
 networks:
   my_network:
