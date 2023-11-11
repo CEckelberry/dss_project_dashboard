@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Note: Make sure to make this script executable by running 'chmod +x startup.sh'
-
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -10,7 +8,7 @@ command_exists() {
 # Install a specific version of Google Chrome
 install_google_chrome() {
     echo "Installing Google Chrome version 119.0.6045.123..."
-    # Replace the URL below with the direct download link for Google Chrome version 119.0.6045.123
+    # Replace with the actual download link and package name
     wget [DIRECT_DOWNLOAD_LINK_FOR_GOOGLE_CHROME_VERSION_119.0.6045.123]
     sudo dpkg -i [DOWNLOADED_GOOGLE_CHROME_DEB_PACKAGE_NAME]
     sudo apt-get -f install -y
@@ -21,23 +19,19 @@ install_google_chrome() {
 install_chromedriver() {
     echo "Installing ChromeDriver version 119.0.6045.105..."
 
-    # Remove any existing ChromeDriver binaries in the system to avoid version conflicts
+    # Define the ChromeDriver directory
+    CHROMEDRIVER_DIR="$HOME/.local/bin"
+
+    # Remove any existing ChromeDriver binaries in system paths and local bin
     sudo rm -f /usr/local/bin/chromedriver
     sudo rm -f /usr/bin/chromedriver
+    rm -f "$CHROMEDRIVER_DIR/chromedriver"
 
-    # Download ChromeDriver
+    # Download and install ChromeDriver
     curl -L "https://chromedriver.storage.googleapis.com/119.0.6045.105/chromedriver_linux64.zip" -o chromedriver_linux64.zip
-    
-    # Extract ChromeDriver and move it to a known directory
-    CHROMEDRIVER_DIR="$HOME/.local/bin"
     unzip -o chromedriver_linux64.zip -d "$CHROMEDRIVER_DIR"
     rm chromedriver_linux64.zip
-
-    # Add execute permissions
     chmod +x "$CHROMEDRIVER_DIR/chromedriver"
-
-    # Add the ChromeDriver directory to PATH
-    export PATH="$CHROMEDRIVER_DIR:$PATH"
 }
 
 # Check if Python is installed
