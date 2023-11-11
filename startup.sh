@@ -39,6 +39,12 @@ for package in "${required_packages[@]}"; do
     pip3.10 install "$package"
 done
 
+# Check if unzip is installed, install it if not
+if ! command_exists unzip; then
+    echo "unzip is not installed. Installing unzip."
+    sudo apt-get install unzip
+fi
+
 # Check if ChromeDriver is installed
 if ! command_exists chromedriver; then
     echo "ChromeDriver is not installed. Installing ChromeDriver."
