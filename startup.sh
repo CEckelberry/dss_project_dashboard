@@ -7,28 +7,20 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Install Google Chrome
+# Install a specific version of Google Chrome
 install_google_chrome() {
-    echo "Installing Google Chrome..."
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    sudo dpkg -i google-chrome-stable_current_amd64.deb
+    echo "Installing Google Chrome version 119.0.6045.123..."
+    # Replace the URL below with the direct download link for Google Chrome version 119.0.6045.123
+    wget [DIRECT_DOWNLOAD_LINK_FOR_GOOGLE_CHROME_VERSION_119.0.6045.123]
+    sudo dpkg -i [DOWNLOADED_GOOGLE_CHROME_DEB_PACKAGE_NAME]
     sudo apt-get -f install -y
-    rm google-chrome-stable_current_amd64.deb
+    rm [DOWNLOADED_GOOGLE_CHROME_DEB_PACKAGE_NAME]
 }
 
-# Install ChromeDriver matching Google Chrome version
+# Install a specific version of ChromeDriver
 install_chromedriver() {
-    # Get the installed version of Google Chrome
-    CHROME_VERSION=$(google-chrome --version | grep -oP "Google Chrome \K[^ ]+")
-    CHROME_MAIN_VERSION=$(echo $CHROME_VERSION | cut -d'.' -f1)
-
-    # Get the corresponding ChromeDriver version
-    CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAIN_VERSION")
-
-    echo "Installing ChromeDriver version $CHROMEDRIVER_VERSION for Google Chrome version $CHROME_VERSION..."
-
-    # Download ChromeDriver
-    curl -L "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -o chromedriver_linux64.zip
+    echo "Installing ChromeDriver version 119.0.6045.105..."
+    curl -L "https://chromedriver.storage.googleapis.com/119.0.6045.105/chromedriver_linux64.zip" -o chromedriver_linux64.zip
     
     # Extract ChromeDriver and move it to a known directory
     CHROMEDRIVER_DIR="$HOME/.local/bin"
@@ -45,12 +37,9 @@ install_chromedriver() {
 # Check if Python is installed
 if ! command_exists python3.10; then
     echo "Python 3.10 is not installed. Installing Python 3.10.1."
-    # Add appropriate installation commands here based on the OS
-    # For example, on Ubuntu:
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt-get update
     sudo apt-get install python3.10
-    # Re-run the script to refresh the environment
     exec "$0"
 fi
 
@@ -85,17 +74,8 @@ if ! command_exists google-chrome; then
     install_google_chrome
 fi
 
-# Check if ChromeDriver is installed or if its version matches Google Chrome
-if ! command_exists chromedriver; then
-    install_chromedriver
-else
-    # Check if the ChromeDriver version matches the Google Chrome version
-    INSTALLED_CHROMEDRIVER_VERSION=$(chromedriver --version | grep -oP "ChromeDriver \K[^ ]+" | cut -d'.' -f1)
-    if [ "$INSTALLED_CHROMEDRIVER_VERSION" != "$CHROME_MAIN_VERSION" ]; then
-        echo "ChromeDriver version does not match Google Chrome version. Reinstalling ChromeDriver..."
-        install_chromedriver
-    fi
-fi
+# Install ChromeDriver
+install_chromedriver
 
 # Define script relative paths
 script_paths=(
