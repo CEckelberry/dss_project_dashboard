@@ -29,7 +29,8 @@ The dashboard is containerized using Docker. Follow these steps to set it up:
 
 ### For Linux Users
 
-- Execute the `startup.sh` Shell script.
+- run chmod +x startup.sh
+- Execute the `startup.sh` Shell script using ./startup.sh command
 - Similar to Windows, this script downloads CSV data and sets up the Docker environment.
 - Wait for the database and data uploader to complete their tasks.
 - ![uploader has finished](image.png)
