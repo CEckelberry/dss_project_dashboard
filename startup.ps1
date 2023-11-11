@@ -1,3 +1,4 @@
+# Function to check if a command exists
 function Test-CommandExists {
     param($command)
     $oldPreference = $ErrorActionPreference
@@ -17,9 +18,11 @@ function Test-CommandExists {
 
 # Check if Python is installed
 if (-not (Test-CommandExists 'python')) {
-    Write-Output "Python is not installed. Please install Python before proceeding."
-    # Add steps here to download and install Python if you want to automate this process
-    exit
+    Write-Output "Python is not installed. Installing Python 3.10.1."
+    # Download Python installer
+    Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.10.1/python-3.10.1-amd64.exe" -OutFile "python-3.10.1-amd64.exe"
+    # Run installer
+    Start-Process -FilePath ".\python-3.10.1-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
 }
 
 # Check if pip is installed

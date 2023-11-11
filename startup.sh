@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Note: Make sure to make this script executable by running 'chmod +x startup.sh'
+
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -7,9 +9,12 @@ command_exists() {
 
 # Check if Python is installed
 if ! command_exists python; then
-    echo "Python is not installed. Please install Python before proceeding."
-    # Add steps here to download and install Python if you want to automate this process
-    exit 1
+    echo "Python is not installed. Installing Python 3.10.1."
+    # Add appropriate installation commands here based on the OS
+    # For example, on Ubuntu:
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt-get update
+    sudo apt-get install python3.10
 fi
 
 # Check if pip is installed
