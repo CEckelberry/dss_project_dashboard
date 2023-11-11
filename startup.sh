@@ -7,20 +7,29 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Flag to indicate if Python was installed
+python_installed=0
+
 # Check if Python is installed
-if ! command_exists python; then
+if ! command_exists python3; then
     echo "Python is not installed. Installing Python 3.10.1."
     # Add appropriate installation commands here based on the OS
     # For example, on Ubuntu:
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt-get update
     sudo apt-get install python3.10
+    python_installed=1
 fi
 
 # Check if pip is installed
-if ! command_exists pip; then
+if ! command_exists pip3; then
     echo "pip is not installed. Installing pip."
-    python -m ensurepip
+    python3 -m ensurepip
+fi
+
+# If Python was just installed, re-run the script
+if [ "$python_installed" -eq 1 ]; then
+    exec "$0"
 fi
 
 # List of required Python packages
@@ -28,7 +37,7 @@ required_packages=("pandas" "selenium")
 
 # Install required Python packages
 for package in "${required_packages[@]}"; do
-    pip install "$package"
+    pip3 install "$package"
 done
 
 # Define script relative paths
@@ -39,7 +48,7 @@ script_paths=(
 
 # Navigate and run scripts
 for path in "${script_paths[@]}"; do
-    python "$path"
+    python3 "$path"
 done
 
 # Start Docker Compose services
