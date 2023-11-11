@@ -4,6 +4,7 @@ from pandasql import sqldf
 import altair as alt
 
 
+@st.cache_data
 def solar_production():
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")

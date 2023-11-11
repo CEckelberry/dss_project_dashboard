@@ -4,6 +4,7 @@ import altair as alt
 from sidebar import sidebar
 
 
+@st.cache_data
 def ghg_emissions():
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
@@ -22,8 +23,8 @@ def ghg_emissions():
             "Indicator",
             "Unit",
             "Source",
-            "CTS_Code",
-            "CTS_Full_Descriptor",
+            "CTS Code",
+            "CTS Full Descriptor",
             "Scale",
         ],
         axis=1,
@@ -91,7 +92,7 @@ def ghg_emissions():
     df_filtered = df[
         (df["Gas Type"] == "Greenhouse gas")
         & (
-            df["CTS_Name"]
+            df["CTS Name"]
             == "Total GHG Emissions Including Land-Use and Land-Use Change and Forestry"
         )
     ]

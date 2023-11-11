@@ -111,7 +111,7 @@ def create_benelux_energy_csv(input_filename, output_filename):
             df = pd.read_csv(input_filename, skiprows=8, encoding="cp1252")
 
     # Filter for the Netherlands, Belgium, and Luxembourg
-    countries = ["Netherlands, The", "Belgium", "Luxembourg"]
+    countries = ["Netherlands", "Belgium", "Luxembourg"]
     df_filtered = df[df["Country"].isin(countries)]
 
     # Save the filtered data to a new CSV file

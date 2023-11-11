@@ -76,8 +76,22 @@ def process_csv_files(directory, file_names):
             os.remove(zip_path)
 
 
+def rename_and_move_files(source_directory, target_directory, file_mappings):
+    os.makedirs(target_directory, exist_ok=True)  # Ensure the target directory exists
+    for old_name, new_name in file_mappings.items():
+        old_file_path = os.path.join(source_directory, old_name + ".csv")
+        new_file_path = os.path.join(target_directory, new_name + ".csv")
+
+        if os.path.exists(old_file_path):
+            shutil.move(old_file_path, new_file_path)
+            print(f"File renamed and moved: {new_name}")
+
+
 # Set the download path to the current script directory
 script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Set the target data directory relative to the script location
+data_dir = os.path.abspath(os.path.join(script_dir, "..", "data"))
 
 # URLs of the websites
 urls = [
@@ -92,8 +106,17 @@ csv_files_to_keep = [
     "CO2_Emissions_Emissions_Intensities_and_Emissions_Multipliers",
 ]
 
+# Mapping of old file names to new file names
+file_mappings = {
+    "National_Greenhouse_Gas_Emissions_Inventories_and_Implied_National_Mitigation_Nationally_Determined_Contributions_Targets": "DSS_Datasets_GHG_Solar_National_Greenhouse_Gas_Emissions_Inventories_and_Implied_National_Mitigation_Nationally",
+    "CO2_Emissions_Emissions_Intensities_and_Emissions_Multipliers": "DSS_Datasets_GHG_Solar_CO2_Emissions_Emissions_Intensities_and_Emissions_Multipliers",
+}
+
 # Call the function to download the CSV files
 download_latest_csv_file(urls, script_dir)
 
 # Process the CSV files
 process_csv_files(script_dir, csv_files_to_keep)
+
+# Rename and move the files
+rename_and_move_files(script_dir, data_dir, file_mappings)

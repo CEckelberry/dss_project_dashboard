@@ -12,6 +12,7 @@ add_page_title("Energy Production", layout="wide")
 sidebar()
 
 
+@st.cache_data
 def energy_production():
     st.subheader("Growth of Solar in the Energy Mix of Benelux")
     # Initialize connection.

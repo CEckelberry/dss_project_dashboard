@@ -15,6 +15,16 @@ services:
     ports:
       - "5432:5432"
 
+  # Uploader service
+  uploader:
+    build:
+      dockerfile: ./data/Dockerfile
+    command: python3 uploader.py
+    volumes:
+      - csv_volume:/app/data
+    networks:
+      - my_network
+
   # Streamlit service
   streamlit:
     build:
@@ -25,16 +35,6 @@ services:
       - my_network
     ports:
       - "8501:8501"
-
-  # Uploader service
-  uploader:
-    build:
-      dockerfile: ./data/Dockerfile
-    command: python3 uploader.py
-    volumes:
-      - csv_volume:/app/data
-    networks:
-      - my_network
 
 volumes:
   csv_volume: {}
