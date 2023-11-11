@@ -13,10 +13,12 @@ services:
       - my_network
     ports:
       - "5432:5432"
+
   # Streamlit service
   streamlit:
     build:
-      dockerfile: ./dashboard/Dockerfile
+      context: ./dashboard
+      dockerfile: Dockerfile
     command: streamlit run app.py
     volumes:
       - ./dashboard:/dashboard
@@ -24,14 +26,17 @@ services:
       - my_network
     ports:
       - "8501:8501"
+
   # Uploader service
   uploader:
     build:
-      dockerfile: ./data/Dockerfile
+      context: ./data
+      dockerfile: Dockerfile
     command: python3 uploader.py
     volumes:
       - ./data:/app
     networks:
       - my_network
+
 networks:
-  my_network:
+  my_network: {}
