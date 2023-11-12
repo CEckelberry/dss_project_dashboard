@@ -29,13 +29,29 @@ The dashboard is containerized using Docker. Follow these steps to set it up:
 
 ### For Linux Users
 
-- run chmod +x startup.sh
-- Execute the `startup.sh` Shell script using ./startup.sh command
+- Run `chmod +x startup.sh`
+- Execute the `startup.sh` Shell script using `./startup.sh` command
 - Similar to Windows, this script downloads CSV data and sets up the Docker environment.
 - Wait for the database and data uploader to complete their tasks.
+- ![uploader has finished](image.png)
+
+### For macOS Users
+
+- Open the Terminal.
+- Navigate to the cloned repository directory.
+- Run `chmod +x startup_mac.sh` to make the script executable.
+- Execute the `startup_mac.sh` Shell script using `./startup_mac.sh` command.
+- This script will:
+  - Install Homebrew (if not already installed).
+  - Install Python 3.10 and pip using Homebrew.
+  - Install required Python packages like pandas and selenium.
+  - Download and set up ChromeDriver for running Selenium scripts.
+  - Run Python scripts to download necessary data.
+  - Start the Docker environment using `docker-compose`.
+- Wait for the PostgreSQL database to initialize, and the uploader script to insert data. Look for specific confirmation lines in the terminal (shown below).
 - ![uploader has finished](image.png)
 
 ## Using the Dashboard
 
 - Access the Dashboard at: http://localhost:8501/
-- The Dashboard caches queries for improved performance. Switching between panels should not always trigger a re-run of queries.
+- The Dashboard caches queries for improved performance. Switching between panels should not always trigger a re-run of queries. Sometimes you might need to refresh if your screen isn't showing the page icon's.
