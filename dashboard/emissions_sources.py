@@ -10,8 +10,8 @@ add_page_title("Compare Yearly Emissions Sources", layout="wide")
 
 sidebar()
 
+
 def emissions_sources():
-    
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.
@@ -27,23 +27,43 @@ def emissions_sources():
         FROM emissions
         """
     )
-    
+
     # Select relevant columns (including years)
-    selected_columns = ["Country", "Industry"] + [str(year) for year in range(1995, 2019)]
+    selected_columns = ["Country", "Industry"] + [
+        str(year) for year in range(1995, 2019)
+    ]
     emissions_selected = emissions[selected_columns]
 
     # Melt the DataFrame to reshape it for easier processing
-    emissions_melted = pd.melt(emissions_selected, id_vars=["Country", "Industry"], var_name="Year", value_name="Emissions")
+    emissions_melted = pd.melt(
+        emissions_selected,
+        id_vars=["Country", "Industry"],
+        var_name="Year",
+        value_name="Emissions",
+    )
 
     # Convert the "Emissions" column to numeric
-    emissions_melted["Emissions"] = pd.to_numeric(emissions_melted["Emissions"], errors="coerce")
+    emissions_melted["Emissions"] = pd.to_numeric(
+        emissions_melted["Emissions"], errors="coerce"
+    )
 
     # Filter for Netherlands, Belgium, Luxembourg, and sum emissions by Industry and Year
-    netherlands_belgium_luxembourg = emissions_melted[emissions_melted["Country"].isin(["Netherlands", "Belgium", "Luxembourg"])]
-    industry_emissions = netherlands_belgium_luxembourg.groupby(["Year", "Industry"])["Emissions"].sum().round(2).reset_index()
+    netherlands_belgium_luxembourg = emissions_melted[
+        emissions_melted["Country"].isin(["Netherlands", "Belgium", "Luxembourg"])
+    ]
+    industry_emissions = (
+        netherlands_belgium_luxembourg.groupby(["Year", "Industry"])["Emissions"]
+        .sum()
+        .round(2)
+        .reset_index()
+    )
 
     # Get top 10 industries for each year
-    top_10_industries = industry_emissions.groupby("Year").apply(lambda x: x.nlargest(10, "Emissions")).reset_index(drop=True)
+    top_10_industries = (
+        industry_emissions.groupby("Year")
+        .apply(lambda x: x.nlargest(10, "Emissions"))
+        .reset_index(drop=True)
+    )
 
     years = top_10_industries["Year"].unique().tolist()
 
@@ -52,19 +72,32 @@ def emissions_sources():
         (years),
         index=10,
         placeholder="Select Year",
-        key="option1"
+        key="option1",
     )
 
     filtered_data = top_10_industries[top_10_industries["Year"] == str(option)]
 
-    colors = ["#17BEBB","#3590F3","#EF626C","#DFC2F2","#D8D8F6", "#c1d7c6", "#a3bcf9", "#7796cb", "#576490", "#f6e8ea"]
+    colors = [
+        "#17BEBB",
+        "#3590F3",
+        "#EF626C",
+        "#DFC2F2",
+        "#D8D8F6",
+        "#c1d7c6",
+        "#a3bcf9",
+        "#7796cb",
+        "#576490",
+        "#f6e8ea",
+    ]
     # Create Altair chart
-    base = alt.Chart(filtered_data).encode(
-        alt.Theta("Emissions:Q").stack(True),
-        alt.Radius("Emissions:Q").scale(type="sqrt", zero=True, rangeMin=20),
-        color=alt.Color("Industry:N", scale=alt.Scale(range=colors))
-    ).properties(
-        height=580
+    base = (
+        alt.Chart(filtered_data)
+        .encode(
+            alt.Theta("Emissions:Q").stack(True),
+            alt.Radius("Emissions:Q").scale(type="sqrt", zero=True, rangeMin=20),
+            color=alt.Color("Industry:N", scale=alt.Scale(range=colors)),
+        )
+        .properties(height=580)
     )
 
     arc_chart = base.mark_arc(innerRadius=20, stroke="#fff")
@@ -76,8 +109,8 @@ def emissions_sources():
 
     st.altair_chart(combined_chart, use_container_width=True)
 
-def emissions_sources2():
 
+def emissions_sources2():
     # Initialize connection.
     conn = st.experimental_connection("postgresql", type="sql")
     # Perform query.
@@ -93,23 +126,43 @@ def emissions_sources2():
         FROM emissions
         """
     )
-    
+
     # Select relevant columns (including years)
-    selected_columns = ["Country", "Industry"] + [str(year) for year in range(1995, 2019)]
+    selected_columns = ["Country", "Industry"] + [
+        str(year) for year in range(1995, 2019)
+    ]
     emissions_selected = emissions[selected_columns]
 
     # Melt the DataFrame to reshape it for easier processing
-    emissions_melted = pd.melt(emissions_selected, id_vars=["Country", "Industry"], var_name="Year", value_name="Emissions")
+    emissions_melted = pd.melt(
+        emissions_selected,
+        id_vars=["Country", "Industry"],
+        var_name="Year",
+        value_name="Emissions",
+    )
 
     # Convert the "Emissions" column to numeric
-    emissions_melted["Emissions"] = pd.to_numeric(emissions_melted["Emissions"], errors="coerce")
+    emissions_melted["Emissions"] = pd.to_numeric(
+        emissions_melted["Emissions"], errors="coerce"
+    )
 
     # Filter for Netherlands, Belgium, Luxembourg, and sum emissions by Industry and Year
-    netherlands_belgium_luxembourg = emissions_melted[emissions_melted["Country"].isin(["Netherlands", "Belgium", "Luxembourg"])]
-    industry_emissions = netherlands_belgium_luxembourg.groupby(["Year", "Industry"])["Emissions"].sum().round(2).reset_index()
+    netherlands_belgium_luxembourg = emissions_melted[
+        emissions_melted["Country"].isin(["Netherlands", "Belgium", "Luxembourg"])
+    ]
+    industry_emissions = (
+        netherlands_belgium_luxembourg.groupby(["Year", "Industry"])["Emissions"]
+        .sum()
+        .round(2)
+        .reset_index()
+    )
 
     # Get top 10 industries for each year
-    top_10_industries = industry_emissions.groupby("Year").apply(lambda x: x.nlargest(10, "Emissions")).reset_index(drop=True)
+    top_10_industries = (
+        industry_emissions.groupby("Year")
+        .apply(lambda x: x.nlargest(10, "Emissions"))
+        .reset_index(drop=True)
+    )
 
     years2 = top_10_industries["Year"].unique().tolist()
 
@@ -118,19 +171,32 @@ def emissions_sources2():
         (years2),
         index=10,
         placeholder="Select Year",
-        key="option2"
+        key="option2",
     )
 
     filtered_data = top_10_industries[top_10_industries["Year"] == str(option2)]
 
-    colors = ["#17BEBB","#3590F3","#EF626C","#DFC2F2","#D8D8F6", "#c1d7c6", "#a3bcf9", "#7796cb", "#576490", "#f6e8ea"]
+    colors = [
+        "#17BEBB",
+        "#3590F3",
+        "#EF626C",
+        "#DFC2F2",
+        "#D8D8F6",
+        "#c1d7c6",
+        "#a3bcf9",
+        "#7796cb",
+        "#576490",
+        "#f6e8ea",
+    ]
     # Create Altair chart
-    base = alt.Chart(filtered_data).encode(
-        alt.Theta("Emissions:Q").stack(True),
-        alt.Radius("Emissions:Q").scale(type="sqrt", zero=True, rangeMin=20),
-        color=alt.Color("Industry:N", scale=alt.Scale(range=colors))
-    ).properties(
-        height=580
+    base = (
+        alt.Chart(filtered_data)
+        .encode(
+            alt.Theta("Emissions:Q").stack(True),
+            alt.Radius("Emissions:Q").scale(type="sqrt", zero=True, rangeMin=20),
+            color=alt.Color("Industry:N", scale=alt.Scale(range=colors)),
+        )
+        .properties(height=580)
     )
 
     arc_chart = base.mark_arc(innerRadius=20, stroke="#fff")
@@ -142,8 +208,9 @@ def emissions_sources2():
 
     st.altair_chart(combined_chart, use_container_width=True)
 
-#2 columns for main page
-col1, col2, col3 = st.columns([8,1,8])
+
+# 2 columns for main page
+col1, col2, col3 = st.columns([8, 1, 8])
 with col1:
     st.header("Emissions Per Industry In Selected Year")
     emissions_sources()
@@ -152,4 +219,3 @@ with col2:
 with col3:
     st.header("Emissions Per Industry In Selected Year")
     emissions_sources2()
-

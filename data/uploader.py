@@ -4,9 +4,6 @@ import psycopg2
 from psycopg2 import sql
 import time
 
-
-time.sleep(6.0)
-
 # PostgreSQL database configuration
 db_config = {
     "dbname": "my_database",
@@ -16,6 +13,15 @@ db_config = {
     "port": "5432",
 }
 
+
+def is_db_ready(db_config):
+    try:
+        psycopg2.connect(**db_config)
+        return True
+    except psycopg2.OperationalError:
+        return False
+
+
 # Function to drop table if it exists
 def drop_table(table_name, conn):
     with conn.cursor() as cursor:
@@ -24,6 +30,7 @@ def drop_table(table_name, conn):
         )
         cursor.execute(drop_table_query)
         conn.commit()
+
 
 # Function to upload CSV files to PostgreSQL
 def upload_csv_to_postgres(csv_file, table_name, conn):
@@ -57,6 +64,12 @@ def upload_csv_to_postgres(csv_file, table_name, conn):
 # Main function to upload all CSV files in the local folder
 def main():
     conn = None  # Initialize the connection variable
+
+    # Wait for the database to be ready
+    while not is_db_ready(db_config):
+        print("Waiting for database to be ready...")
+        time.sleep(85)  # Wait for 60 seconds before trying again
+
     try:
         # Establish database connection
         conn = psycopg2.connect(**db_config)

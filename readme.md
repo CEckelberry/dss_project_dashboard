@@ -1,34 +1,24 @@
 # Data Science and Society Dashboard: Greenhouse Gas Emissions for the Benelux Region and Solar as our Savior
 
-This repository contains a Docker Compose file for running a Data Science and Society Dashboard that displays greenhouse gas emissions for the Benelux region and the potential of solar energy to reduce those emissions.
+## Overview
 
-To set up the Docker environment, you will need to have Docker Desktop installed and running. Once you have Docker Desktop running, you can clone this repository and run the following two commands (while being in the director you just cloned down as shown in the screenshot below):
+The aim with this dashboard is to provide the governments of the Benelux with information on various aspects of energy consumption and solar energy production. The dashboard will encompass an overview of energy consumption across industries, the current state of solar energy generated in the Benelux, and how solar energy can help them with their nationally determined contributions, that each country sets to achieve the Paris Agreement goals.
 
-`docker compose build`
+## Setup
 
-`docker compose up`
+The dashboard is containerized using Docker. Follow these steps to set it up:
 
-![screencap install](install_screencap.png "Install Screencap")
+### Prerequisites
 
-The build command will build the Docker images for all of the services defined in the Docker Compose file. The up command will start all of the services and expose them on the appropriate ports.
+- Docker installed and running on your machine.
 
-Once the services are running, you can access the dashboard at [http://localhost:8501](http://localhost:8501).
+### Installation
 
-Troubleshooting:
+1. Clone this repository.
+2. Wait for the PostgreSQL database to initialize, and the uploader script to insert data. Look for specific confirmation lines in the terminal (shown below).
+   ![uploader has finished](image.png)
 
-If you are having trouble running the dashboard, please check the following:
+## Using the Dashboard
 
-Make sure that Docker Desktop is installed and running.
-Make sure that you have cloned this repository to your local machine.
-Make sure that you have run the docker compose build and docker compose up commands.
-If you are still having trouble, please open an issue in this repository.
-
-Color Palette:
-
-    {
-    #17BEBB
-    #3590F3
-    #EF626C
-    #DFC2F2
-    #D8D8F6
-    }
+- Access the Dashboard at: http://localhost:8501/
+- The Dashboard caches queries for improved performance. Switching between panels should not always trigger a re-run of queries. Sometimes you might need to refresh if your screen isn't showing the page icon's.

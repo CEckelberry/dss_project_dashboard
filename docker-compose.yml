@@ -1,7 +1,25 @@
 version: "3.9"
-
 services:
-  # Postgres database
+
+  # downloader_iea service
+  downloader_iea:
+    build:
+      context: ./downloader_iea
+      dockerfile: Dockerfile
+    volumes:
+      - ./downloader_iea:/app
+      - ./data:/data
+
+  # downloader_imf service
+  downloader_imf:
+    build:
+      context: ./downloader_imf
+      dockerfile: Dockerfile
+    volumes:
+      - ./downloader_imf:/app
+      - ./data:/data
+
+ # Postgres database
   postgres:
     image: postgres:latest
     environment:
@@ -18,7 +36,9 @@ services:
   # Streamlit service
   streamlit:
     build:
-      dockerfile: ./dashboard/Dockerfile
+      context: ./dashboard
+      dockerfile: Dockerfile
+    command: streamlit run app.py
     volumes:
       - ./dashboard:/dashboard
     networks:
@@ -29,12 +49,14 @@ services:
   # Uploader service
   uploader:
     build:
-      dockerfile: ./data/Dockerfile
+      context: ./data
+      dockerfile: Dockerfile
     command: python3 uploader.py
     volumes:
       - ./data:/app
     networks:
       - my_network
 
+
 networks:
-  my_network:
+  my_network: {}
