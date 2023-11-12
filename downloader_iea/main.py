@@ -36,42 +36,38 @@ def download_latest_csv_file(url, download_path, username, password):
     # Initialize the Chrome WebDriver with the specified options
     driver = webdriver.Chrome(options=chrome_options)
 
-    login_to_iea(username, password, driver)
+    # Initialize downloaded_file_name
+    downloaded_file_name = None
 
-    # Navigate to the target URL after logging in
-    driver.get(url)
-
-    # Wait for the necessary elements to load
     try:
+        login_to_iea(username, password, driver)
+        driver.get(url)
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located(
                 (By.CLASS_NAME, "m-product-releases-schedule__items")
             )
         )
-        time.sleep(5)  # Additional wait for the page to fully load
-
-        # Find the download link using the provided XPath
+        time.sleep(5)
         download_link = driver.find_element(
             By.XPATH, "(//span[normalize-space()='CSV'])[1]"
         )
         download_link.click()
+        time.sleep(10)
 
-        time.sleep(10)  # Wait for the download to complete
         files = os.listdir(download_path)
         files = [f for f in files if f.endswith(".csv")]
         if files:
             downloaded_file_name = max(
                 files, key=lambda x: os.path.getctime(os.path.join(download_path, x))
             )
-
-        print(
-            "Download started. Please check the specified download folder for the CSV file."
-        )
+        else:
+            print("No CSV files found in the download directory.")
     except Exception as e:
         print(f"An error occurred while attempting to download the CSV: {e}")
     finally:
         driver.quit()
 
+    # Return the downloaded file name
     return downloaded_file_name
 
 
