@@ -15,7 +15,8 @@ The dashboard is containerized using Docker. Follow these steps to set it up:
 ### Installation
 
 1. Clone this repository.
-2. Wait for the PostgreSQL database to initialize, and the uploader script to insert data. Look for specific confirmation lines in the terminal (shown below).
+2. run the following command: `docker-compose up --build`
+3. Wait for the PostgreSQL database to initialize, and the uploader script to insert data. Look for specific confirmation lines in the terminal (shown below).
    ![uploader has finished](image.png)
 
 ## Using the Dashboard
