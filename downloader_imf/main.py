@@ -9,16 +9,18 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import shutil
 
+# Add chromedriver path to PATH environment variable
+os.environ["PATH"] += os.pathsep + "/usr/local/bin"
+
 
 def download_latest_csv_file(urls, download_path):
-    # Set up Chrome options to specify the download directory
     chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
     prefs = {"download.default_directory": download_path}
     chrome_options.add_experimental_option("prefs", prefs)
 
-    # Initialize the WebDriver
     driver = webdriver.Chrome(options=chrome_options)
-
     try:
         for url in urls:
             # Navigate to the website
