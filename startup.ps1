@@ -4,7 +4,7 @@ function Test-CommandExists {
     $oldPreference = $ErrorActionPreference
     $ErrorActionPreference = 'SilentlyContinue'
     try {
-        if (Get-Command $command) {
+        if (Get-Command $command -ErrorAction SilentlyContinue) {
             return $true
         }
         else {
@@ -23,6 +23,10 @@ if (-not (Test-CommandExists 'python')) {
     Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.10.1/python-3.10.1-amd64.exe" -OutFile "python-3.10.1-amd64.exe"
     # Run installer
     Start-Process -FilePath ".\python-3.10.1-amd64.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
+
+    # Update PATH for the current session
+    $pythonPath = "C:\Python310\Scripts;C:\Python310"
+    $env:Path += ";$pythonPath"
 }
 
 # Check if pip is installed
