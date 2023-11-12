@@ -1,6 +1,25 @@
 version: "3.9"
 services:
-  # Postgres database
+
+  # downloader_iea service
+  downloader_iea:
+    build:
+      context: ./downloader_iea
+      dockerfile: Dockerfile
+    volumes:
+      - ./downloader_iea:/app
+      - ./data:/data
+
+  # downloader_imf service
+  downloader_imf:
+    build:
+      context: ./downloader_imf
+      dockerfile: Dockerfile
+    volumes:
+      - ./downloader_imf:/app
+      - ./data:/data
+
+ # Postgres database
   postgres:
     image: postgres:latest
     environment:
@@ -37,6 +56,7 @@ services:
       - ./data:/app
     networks:
       - my_network
+
 
 networks:
   my_network: {}
