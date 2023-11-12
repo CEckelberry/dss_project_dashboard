@@ -68,7 +68,7 @@ def main():
     # Wait for the database to be ready
     while not is_db_ready(db_config):
         print("Waiting for database to be ready...")
-        time.sleep(60)  # Wait for 60 seconds before trying again
+        time.sleep(85)  # Wait for 60 seconds before trying again
 
     try:
         # Establish database connection
