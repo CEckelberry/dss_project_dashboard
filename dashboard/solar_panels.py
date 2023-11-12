@@ -65,21 +65,19 @@ def solar_panels():
         # Calculate the number of solar panels needed, based on the selected wattage
         number_of_solar_panels = int(total_fossil_fuels_watts / selected_wattage)
 
-        st.markdown(
-            f"<p style='text-align:center;'>Based on the data and the selected wattage ({selected_wattage} watts), the number of solar panels needed to replace fossil fuels is calculated</p>",
-            unsafe_allow_html=True,
+        formatted_number_of_solar_panels = f"{number_of_solar_panels:,}"
+        
+        st.markdown(f"<p style='text-align:center;'>Based on the data and the selected wattage ({selected_wattage} watts), the number of solar panels needed to replace fossil fuels is calculated</p>",
+            unsafe_allow_html=True
         )
 
-        st.markdown(
-            f"<div style='display: flex; flex-direction: column; align-items: center; width: 350px; background-color:#e6f3ff;padding:5px;border-radius:10px; margin: auto;'> <p style='font-size:18px;font-weight:bold;margin-bottom:0px;'>Number of Solar Panels Needed</p> <p style='font-size:24px;font-weight:bold;margin-top:0px;'>{number_of_solar_panels}</p> </div>",
-            unsafe_allow_html=True,
-        )
+        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; width: 350px; background-color:#e6f3ff;padding:5px;border-radius:10px; margin: auto;'> <p style='font-size:18px;font-weight:bold;margin-bottom:0px;'>Number of Solar Panels Needed</p> <p style='font-size:24px;font-weight:bold;margin-top:0px;'>{formatted_number_of_solar_panels}</p> </div>", unsafe_allow_html=True)
 
     with col2:
         st.markdown(
             """
             <div style='text-align: justify; background-color: #f9f9f9; padding: 20px; border-radius: 10px;'>
-                <p style='font-size: 18px;'>\U0001F4A1<span style='margin-left: 10px'>Outlined here is an estimate of the required solar panels to entirely substitute fossil fuels.</span></p>
+                <p style='font-size: 18px;'>\U0001F4A1<span style='margin-left: 10px'>Outlined here is an estimate of the required solar panels to entirely substitute fossil fuels in Benelux.</span></p>
                 <p style='font-size: 18px;'>Solar panel performance is significantly influenced by wattage, where higher wattage panels generate more power. Residential solar panels typically range from 250 to 400 watts, with the most efficient models offering 370 to 445 watts. Higher wattage translates to increased energy output, reducing the number of panels needed for the same power generation.</p>
             </div>
             """,
