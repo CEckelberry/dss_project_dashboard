@@ -23,3 +23,12 @@ The dashboard is containerized using Docker. Follow these steps to set it up:
 
 - Access the Dashboard at: http://localhost:8501/
 - The Dashboard caches queries for improved performance. Switching between panels should not always trigger a re-run of queries. Sometimes you might need to refresh if your screen isn't showing the page icon's.
+
+## If you want to run the prediction model yourself
+
+Due to the sheer size and performance hit of running pytorch + neuralprophet + other large packages, when running alongside our dashboard, we decided it would be best to create a separate docker container where these machine learning packages can be run at your leisure, this prevents the dashboard docker-commpose from taking > 15 minutes to build/run. In addition to the build times, we saw significant dropoff in performance/load times of the dashboard. You can run the predictions docker container with the below instructions:
+
+1. cd into the predictions folder
+2. run `docker build -t solar-prediction-app .`
+3. once the build is done, run `docker run -v ${PWD}/predictions:/usr/src/app/output solar-prediction-app`
+4. The predictions script will run and output a csv
